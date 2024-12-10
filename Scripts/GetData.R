@@ -57,8 +57,18 @@ siteData <- all_sites %>%
 monkeyData <- siteData %>%
   left_join(occSummary, by=c("id"="Site"))
 
+# Prepare values for analysis
 monkeyData <- monkeyData %>%
-  mutate(occ = if_else(is.na(occ),0,1))
+  mutate(occ = if_else(is.na(occ),0,1),    # all grid cells show presence/absence
+         scaleEffort = scale(Effort),           # Scale values: Effort
+         scaleElevmean = scale(Elevmean),       # Scale values: Elevmean
+         scaleRiverDist = scale(RiverDist),     # Scale values: RiverDist
+         scaleRoadDist = scale(RoadDist),       # Scale values: RoadDist
+         scaleVillDist = scale(VillDist),       # Scale values: VillDist
+         scaleRuggmean = scale(Ruggmean))       # Scale values: Ruggmean
+
+# Check the data structure
+str(monkeyData)
 
 
 #Save the data file

@@ -20,26 +20,17 @@
 # library(distributional)
 # library(marginaleffects)
 
-#get the data
+if(!require(corrr)){install.packages("corrr"); library(corrr)} # for correlations
+
+# Get the data
 monkeyData <- readRDS("Data/monkeyData.rds")
 
-#scale the covariates
-monkeyData[12 : 16] <- as.data.frame(scale(monkeyData[12 : 16]))
-    
-    # Elevation
-    ##### Altitude can be removed as using mean variables for grid
-    # dist vill
-    # dist road
-    # river dist
-    # ruggedness
-    # canopy
-    # year?date? -  leave for now
+# Scale the covariates
+   ### Already done in GetData.R
 
-#examine correlations
-# and remove if over 0.7
-cor(monkeyData[12:16], method='s', use='complete.obs')
-  # Road distance and vilalge distance are highly correlated
-
+# Examine correlations and don't combine if over 0.7
+cor(dplyr::select(monkeyData,Effort:Ruggmean), method='s', use='complete.obs')
+  # Road distance and village distance are highly correlated
 
 # Add new boolean dat
 
