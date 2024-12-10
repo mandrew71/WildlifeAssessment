@@ -24,18 +24,49 @@ ourSpecies <- "Red-eared monkey"
 
 # Trim the dataframe
 monkeyData <- all_species %>%         # Clean dataframe for our monkey
-  filter(Species == ourSpecies) %>%   # Only our monkey
-  dplyr::select(Site,                 # Grab the columns we need
-                TotalEffor,
-                Area_2,
-                Month,
-                Date,
-                Observed,
-                Estimated,
-                Position,
-                Long_E,
-                Lat_N,
-                Alt.m.)
+  filter(Species == ourSpecies,       # Only our monkey
+         !(is.na(Observed))) %>%      # No empty observation cells
+  dplyr::select(Site,                 # Grid site
+                Species,              # Species
+                Effort = TotalEffor,  # Total effort
+                Area = Area_2,        # Area (e.g. Ebo forest)
+                Month,                # Month observed
+                Date,                 # Date observed
+                Observed,             # Number observed
+                Estimated,            # Estimated number of individuals 
+                Position,             # Height in canopy
+                Long_E,               # Longitude
+                Lat_N,                # Latitude
+                Altitude = Alt.m.)    # Altitude
+
+
+# Get the site data
+all_sites <- read.csv("Data/YKBA_Site_characteristics.csv")
+
+# Let's have a look
+head(all_sites)
+str(all_sites)
+
+
+# trim the site data
+siteData <- all_sites %>%
+  select(id,
+         Elevmean,
+         RiverDist,
+         RoadDist,
+         VillDist,
+         Ruggmean
+         )
+
+# add the site values onto our monkey dataset
+monkeyData <- monkeyData %>%
+  left_join(siteData, by=c("Site"="id"))
+
+
+#Save the data file
+saveRDS(monkeyData, file="Data/monkeyData.rds") 
+
+  
 
 
 
