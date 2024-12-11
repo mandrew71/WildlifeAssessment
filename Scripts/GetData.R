@@ -43,7 +43,7 @@ str(all_sites)
 
 # trim the site data
 siteData <- all_sites %>%
-  select(id,
+  select(Site = id,
          Area,
          Effort = TotalEffor,
          Elevmean,
@@ -55,7 +55,7 @@ siteData <- all_sites %>%
 
 # Join the two datasets
 monkeyData <- siteData %>%
-  left_join(occSummary, by=c("id"="Site"))
+  left_join(occSummary, by=c("Site"="Site"))
 
 # Prepare values for analysis
 monkeyData <- monkeyData %>%
