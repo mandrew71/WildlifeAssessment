@@ -50,3 +50,6 @@ rsconnect/
 
 # .Rproj file
 WildlifeAssessment.Rproj
+
+# test file
+Test.R
