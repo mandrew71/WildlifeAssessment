@@ -27,6 +27,7 @@ plotData$Elevation <- M + (plotData$scaleElevmean * SD)
     geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "lightcoral") +  # Add the confidence interval ribbon
     geom_line(aes(y = estimate__), colour="firebrick1", linewidth=1) +       # Add the trend line 
     scale_x_continuous(limits=c(0,1200), breaks=seq(0,1200,200)) +           # Set the x-axis
+    scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2)) +           # Set the y-axis
     labs(x="Elevation (m asl)",                                                  # Label the x-axis
          y="Occurrence probability",                                         # Label the y-axis 
          title="Occurrence probability of Red eared monkey")                 # Add a title
@@ -52,6 +53,7 @@ plotData$Ruggedness <- M + (plotData$scaleRuggmean * SD)
     geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "lightblue1") + # Add the confidence interval ribbon
     geom_line(aes(y = estimate__), colour="skyblue4", linewidth=1) +        # Add the trend line 
     scale_x_continuous(limits=c(0,50), breaks=seq(0,50,10)) +               # Set the x-axis
+    scale_y_continuous(limits=c(0,1), breaks=seq(0,1,0.2)) +           # Set the y-axis
     labs(x="Ruggedness index",                                              # Label the x-axis
          y="Occurrence probability",                                        # Label the y-axis 
          title="Occurrence probability of Red eared monkey")                # Add a title

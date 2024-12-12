@@ -72,7 +72,11 @@ str(humanData)
 
 
 #Save the data file
+<<<<<<< HEAD
 saveRDS(humanData, file="Data/humanData.rds") 
+=======
+saveRDS(monkeyData, file="Data/humanData.rds") 
+>>>>>>> 42ff16ebfa25134ceca1803f59424f605cbaf5a5
 
   
 
