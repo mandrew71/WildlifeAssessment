@@ -4,6 +4,7 @@
 if(!require(ggplot2)){install.packages("ggplot2"); library(ggplot2)} # for graphs
 
 #Load our model the easy way
+monkeyData <- readRDS("Data/monkeyData.rds")
 modElevRugg <- readRDS("Data/modElevRugg.rds")
 
 
