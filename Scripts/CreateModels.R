@@ -106,7 +106,7 @@ modRugg <- brm(occ ~ scaleRuggmean + offset(log(Effort)),
 conditional_effects(modRugg)
 
 
-### Add criterion??
+# Add criteria for comparison
 m0 <- add_criterion(modNull, "loo")
 ma <- add_criterion(modElev, "loo")
 mb <- add_criterion(modRiver, "loo")
@@ -151,10 +151,12 @@ modElevRugg <- brm(occ ~ scaleElevmean + scaleRuggmean + offset(log(Effort)),
 # CI 
 conditional_effects(modElevRugg)
 
+### This is a good model. Let's save it
+saveRDS(modElevRugg, file="Data/modElevRugg.rds") 
 
 
 
-### Add criterion??
+# Add criteria for comparison
 maa <- add_criterion(modElevRiver, "loo")
 mab <- add_criterion(modElevVill, "loo")
 mac <- add_criterion(modElevRugg, "loo")
@@ -181,12 +183,9 @@ modElevRuggVill <- brm(occ ~ scaleRuggmean + scaleElevmean + scaleVillDist + off
                    family = bernoulli(link="logit"),
                    warmup = 2000, iter = 4000, chains = 4)
 # CI 
-
 conditional_effects(modElevRuggVill)
 
-
-##################### TO HERE
-
+# Add criteria for comparison
 maca <- add_criterion(modElevRuggRiver, "loo")
 macb <- add_criterion(modElevRuggVill, "loo")
 
@@ -211,46 +210,23 @@ effects <- conditional_effects(modElevRugg)
 plotData <- effects[[1]]
 summary(plotData)
 
+max(monkeyData$Elevmean)
+
 M  <- mean(monkeyData$Elevmean)   # Mean of original elevation data
 SD  <- sd(monkeyData$Elevmean)    # SD of original elevation data
 
 # Back transform the sclaed elevation values to natural values
 plotData$Elevation <- M + (plotData$scaleElevmean * SD)
 
-
-(trendPlot <- ggplot(plotData, aes(Elevation)) +
- geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "slategrey") +
- geom_line(aes(y = estimate__), colour="gray0", linewidth=1) +
-    labs(y="Occurrence probability", title="Occurrence probability of Red eared monkey")
-
+# Plot the data
+(trendPlot <- ggplot(plotData, aes(Elevation)) +                             # Create the plot
+    geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "lightcoral") +  # Add the confidence interval ribbon
+    geom_line(aes(y = estimate__), colour="firebrick1", linewidth=1) +       # Add the trend line 
+    scale_x_continuous(limits=c(0,1200), breaks=seq(0,1200,200)) +           # Set the x-axis
+    labs(x="Elevation (m)",                                                  # Label the x-axis
+         y="Occurrence probability",                                         # Label the y-axis 
+         title="Occurrence probability of Red eared monkey")                 # Add a title
   )
-
-# #Plot with the original values on the x axis
-# 
-# h <- ggplot(dt, aes(Rugge)) +
-#   geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "grey70") +
-#   geom_line(aes(y = estimate__), colour="gray0", linewidth=1)+
-#   theme_bw()+
-#   theme(panel.grid.major.x = element_blank(),
-#         panel.grid.minor.x = element_blank(),
-#         panel.grid.major.y = element_blank(),
-#         panel.grid.minor.y = element_blank())+
-#   labs(x = "Terrain ruggednex index", y = "Occurrence probability")+
-#   theme(axis.text.y = element_text(size = 18, colour="black"), 
-#         axis.text.x = element_text(size = 18, colour="black"), 
-#         axis.title = element_text(face = "plain", size = 18), 
-#         plot.title = element_text(face = "bold", size = 18)) +
-#   scale_y_continuous(limits= c(0.0,0.11,0.030), breaks = seq(0.0,0.11,0.030)) +
-#   #scale_x_continuous(limits= c(0,1100,300), breaks = seq(0,1100,300)) +
-#   facet_wrap(~"Putty-nosed monkey")+
-#   theme(strip.background =element_rect(fill="grey50"))+
-#   theme(strip.text = element_text(colour = 'white'))+
-#   theme(strip.text.x = element_text(size = 18, face="bold"))
-# 
-# h
-# 
-# ggsave(h, file="ElephRugg.png", width = 5, height = 4, dpi=600)
-
-
-
+#Lovely. Let's save that graph
+ggsave(trendPlot, file="Plots/ElevRuggTrend.png", width=8, height=8)
 
