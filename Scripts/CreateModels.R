@@ -1,28 +1,10 @@
 # Create the models for analysis
 # 10 December 2024
 
-# library(magrittr)
-# library(dplyr)
-# library(purrr)
-# library(forcats)
-# library(tidyr)
-# library(modelr)
-# library(ggdist)
-# library(tidybayes)
-# library(ggplot2)
-# library(cowplot)
-# library(rstan)
-# library(brms)
-# library(ggrepel)
-# library(RColorBrewer)
-# library(gganimate)
-# library(posterior)
-# library(distributional)
-# library(marginaleffects)
 
-#if(!require(corrr)){install.packages("corrr"); library(corrr)} # for correlations
+# Libraries
 if(!require(brms)){install.packages("brms"); library(brms)} # for modelling
-if(!require(ggplot2)){install.packages("ggplot2"); library(ggplot2)} # for modelling
+if(!require(ggplot2)){install.packages("ggplot2"); library(ggplot2)} # for graphs
 
 # Get the data
 monkeyData <- readRDS("Data/monkeyData.rds")
@@ -169,7 +151,7 @@ loo_compare(m0, ma, maa, mab, mac, criterion = "loo")
 
 #-------------------------------------
 # Elevation plus ruggedness plus river
-modElevRuggRiver <- brm(occ ~ scaleRuggmean + scaleElevmean + scaleRiverDist + offset(log(Effort)),
+modElevRuggRiver <- brm(occ ~ scaleElevmean + scaleRuggmean + scaleRiverDist + offset(log(Effort)),
                     data = monkeyData,
                     family = bernoulli(link="logit"),
                     warmup = 2000, iter = 4000, chains = 4)
@@ -178,7 +160,7 @@ conditional_effects(modElevRuggRiver)
 
 
 # Elevation plus village distance
-modElevRuggVill <- brm(occ ~ scaleRuggmean + scaleElevmean + scaleVillDist + offset(log(Effort)),
+modElevRuggVill <- brm(occ ~ scaleElevmean + scaleRuggmean + scaleVillDist + offset(log(Effort)),
                    data = monkeyData,
                    family = bernoulli(link="logit"),
                    warmup = 2000, iter = 4000, chains = 4)
@@ -203,6 +185,10 @@ loo_compare(m0, ma, mac, maca, macb, criterion = "loo")
 
 
 #################################
+#Load our model the easy way
+modElevRugg <- readRDS("Data/modElevRugg.rds")
+
+
 # Extract conditional effects
 effects <- conditional_effects(modElevRugg)
 
@@ -223,10 +209,35 @@ plotData$Elevation <- M + (plotData$scaleElevmean * SD)
     geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "lightcoral") +  # Add the confidence interval ribbon
     geom_line(aes(y = estimate__), colour="firebrick1", linewidth=1) +       # Add the trend line 
     scale_x_continuous(limits=c(0,1200), breaks=seq(0,1200,200)) +           # Set the x-axis
-    labs(x="Elevation (m)",                                                  # Label the x-axis
+    labs(x="Elevation (m asl)",                                                  # Label the x-axis
          y="Occurrence probability",                                         # Label the y-axis 
          title="Occurrence probability of Red eared monkey")                 # Add a title
   )
 #Lovely. Let's save that graph
-ggsave(trendPlot, file="Plots/ElevRuggTrend.png", width=8, height=8)
+ggsave(trendPlot, file="Plots/ER_ElevationTrend.png", width=8, height=6)
+
+
+
+
+# Plot against ruggedness
+plotData <- effects[[2]]
+max(monkeyData$Ruggmean)
+
+M  <- mean(monkeyData$Ruggmean)   # Mean of original elevation data
+SD  <- sd(monkeyData$Ruggmean)    # SD of original elevation data
+
+# Back transform the sclaed elevation values to natural values
+plotData$Ruggedness <- M + (plotData$scaleRuggmean * SD)
+
+# Plot the data
+(trendPlot <- ggplot(plotData, aes(Ruggedness)) +                           # Create the plot
+    geom_ribbon(aes(ymin = lower__, ymax = upper__), fill = "lightblue1") + # Add the confidence interval ribbon
+    geom_line(aes(y = estimate__), colour="skyblue4", linewidth=1) +        # Add the trend line 
+    scale_x_continuous(limits=c(0,50), breaks=seq(0,50,10)) +               # Set the x-axis
+    labs(x="Ruggedness index",                                              # Label the x-axis
+         y="Occurrence probability",                                        # Label the y-axis 
+         title="Occurrence probability of Red eared monkey")                # Add a title
+)
+#Lovely. Let's save that graph
+ggsave(trendPlot, file="Plots/ER_RuggednessTrend.png", width=8, height=6)
 
