@@ -15,7 +15,7 @@ str(all_species)
 # Check species observation counts
 speciesSummary <- all_species %>%          # create a new object to see the summaries
   group_by(Species) %>%                    # group by species
-  summarise(spCount = length(Month)) %>%   # get the count of rows for each species
+  summarise(spCount = n()) %>%   # get the count of rows for each species
   ungroup()       
 
 # view the data
@@ -26,15 +26,24 @@ speciesSummary
 ourSpecies <- "Red-eared monkey"
 #----------------------------------
 
-!!!!!!
+
+test <- all_species %>%
+  filter(is.na(Group.ID)) %>%
+  filter(Species == ourSpecies) %>%
+  mutate (Group.ID = 999+Site)
+
+
   # Get an occurrence dataset
   occSummary <- all_species %>%           # create a new object to hold the summary
   filter(!is.na(Group.ID)) %>%           # Only our multispecies groups
-  #group_by(Site) %>%                    # group by grid cell
   summarise(occ = 1) %>%                # Set occurrence = 1 for all rows
   ungroup()                             # ungroup
 
 cleaned_specieslist <- all_species %>% filter(!is.na(Group.ID))
+
+
+cleaned_specieslist <- rbind(cleaned_specieslist, test)
+
 
 print(cleaned_specieslist)
 
@@ -42,7 +51,7 @@ print(cleaned_specieslist)
 # trim the site dataset to only multispecies groups
 multispecies<- cleaned_specieslist %>%
   select(Group.ID, Species, Observed, Estimated)
-  )
+  
 #filter for multispiecies groups that inclucde red eared monkeys
 
 multiRedeared <- multispecies %>%
@@ -60,23 +69,24 @@ other_species_count <- multiRedeared %>%
 
 
 # plot Histogramm, but this one is with absolute group numbers  
-ggplot(other_species_count, aes(x = OtherSpeciesCount)) +
+(famousEric <- ggplot(other_species_count, aes(x = OtherSpeciesCount)) +
   geom_histogram(binwidth = 1, fill = "blue", color = "black", alpha = 0.7) +
   labs(
     title = "Frequency of species combinations with Red-eared Monkey",
     x = "Number of other species",
     y = "Frequency "
   ) +
-  theme_minimal()
+  theme_minimal())
+
 
 #plotted in percentage to compair with reference data
 
-ggplot(other_species_count, aes(x = OtherSpeciesCount)) +
+(groupPlot <- ggplot(other_species_count, aes(x = OtherSpeciesCount)) +
   geom_histogram(
     binwidth = 1,
-    fill = "violet",
-    color = "black",
-    alpha = 0.7,
+    fill = "#af5fe8",
+    color = "darkviolet",
+    #alpha = 0.7,
     aes(y = ..count../sum(..count..)),
     width = 0.7
   ) +
@@ -91,6 +101,9 @@ ggplot(other_species_count, aes(x = OtherSpeciesCount)) +
     y = "Percentage"
   ) +
   theme_minimal()
+)
+
+ggsave(groupPlot, file="Plots/multispecies.png", width=8, height=6)
 
 
 #find top three associated species 
@@ -106,6 +119,7 @@ print(top_3_species)
 #1. Putty-nosed monkey
 #2. Crowned monkey
 #3. Mona monkey 
+
 
 
 
